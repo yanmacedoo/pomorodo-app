@@ -45,7 +45,6 @@ export function useNotifications() {
                     registration.showNotification(title, {
                         icon: '/icon-192x192.png',
                         badge: '/icon-192x192.png',
-                        vibrate: [200, 100, 200],
                         requireInteraction: true,
                         ...options,
                     });
@@ -54,7 +53,6 @@ export function useNotifications() {
                 // Fallback para notificações padrão
                 new Notification(title, {
                     icon: '/icon-192x192.png',
-                    vibrate: [200, 100, 200],
                     ...options,
                 });
             }
