@@ -32,8 +32,33 @@ export function PomodoroTimer({ config }: PomodoroTimerProps) {
     const { sendNotification, requestPermission, permission } = useNotifications();
 
     const handleComplete = () => {
-        const audio = new Audio('/notification.mp3');
-        audio.play().catch(() => console.log('Não foi possível reproduzir o áudio'));
+        // Reproduzir som de notificação
+        try {
+            const audio = new Audio('/notification.mp3');
+            audio.volume = 0.5; // Volume a 50%
+            audio.play().catch((error) => {
+                console.log('Não foi possível reproduzir o áudio:', error);
+                // Tentar tocar beep do sistema como fallback
+                try {
+                    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = 800; // Frequência em Hz
+                    gainNode.gain.value = 0.3; // Volume
+
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 200); // Duração de 200ms
+                } catch (fallbackError) {
+                    console.log('Fallback de áudio também falhou:', fallbackError);
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao tentar reproduzir som:', error);
+        }
 
         sendNotification('Timer Finalizado! ⏰', {
             body: mode === 'work'
